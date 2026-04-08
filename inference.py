@@ -192,6 +192,31 @@ def _greedy_fallback(observation: dict) -> DisasterAction:
 
 
 # ---------------------------------------------------------------------------
+# Structured output helpers — required by the OpenEnv validator
+# Validator expects these exact token patterns on stdout:
+#   [START] task=<name>
+#   [STEP]  step=<n> reward=<float>
+#   [END]   task=<name> score=<float> steps=<n>
+# ---------------------------------------------------------------------------
+
+def emit(line: str) -> None:
+    """Print a structured output line to stdout, flushed immediately."""
+    print(line, flush=True)
+
+
+def emit_start(task_id: str) -> None:
+    emit(f"[START] task={task_id}")
+
+
+def emit_step(step: int, reward: float) -> None:
+    emit(f"[STEP] step={step} reward={reward:.4f}")
+
+
+def emit_end(task_id: str, score: float, steps: int) -> None:
+    emit(f"[END] task={task_id} score={score:.4f} steps={steps}")
+
+
+# ---------------------------------------------------------------------------
 # Single task runner
 # ---------------------------------------------------------------------------
 
@@ -205,6 +230,9 @@ def run_task(client: OpenAI, task_id: str, seed: int = BASELINE_SEED) -> dict:
     step = 0
 
     logger.info(f"  [{task_id}] seed={seed} zones={len(obs.zones)} max_steps={obs.max_steps}")
+
+    # Signal task start to validator
+    emit_start(task_id)
 
     for step in range(1, obs.max_steps + 1):
         if obs_dict.get("done", False):
@@ -241,6 +269,9 @@ def run_task(client: OpenAI, task_id: str, seed: int = BASELINE_SEED) -> dict:
         obs_dict = obs.model_dump()
         total_reward += reward
 
+        # Emit per-step structured line to stdout
+        emit_step(step, reward)
+
         history.append(
             f"Step {step}: zone={action.zone_id} {action.resource_type}×{action.quantity} "
             f"→ reward {reward:+.3f}"
@@ -254,6 +285,9 @@ def run_task(client: OpenAI, task_id: str, seed: int = BASELINE_SEED) -> dict:
 
     grade = env.grade()
     state = env.state()
+
+    # Signal task end with final score to validator
+    emit_end(task_id, grade.score, step)
 
     return {
         "task_id": task_id,
@@ -290,8 +324,13 @@ def run_baseline_all_tasks(seed: int = BASELINE_SEED) -> dict:
 
 def main() -> None:
     if not API_KEY:
-        print("ERROR: HF_TOKEN (or API_KEY) environment variable not set.")
-        print("  Export it: export HF_TOKEN=hf_...")
+        # Still emit structured blocks so the validator can parse something
+        for task_id in TASK_REGISTRY:
+            emit_start(task_id)
+            emit_step(1, 0.0)
+            emit_end(task_id, 0.0, 1)
+        print("ERROR: HF_TOKEN (or API_KEY) environment variable not set.", flush=True)
+        print("  Export it: export HF_TOKEN=hf_...", flush=True)
         sys.exit(1)
 
     client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
@@ -308,15 +347,17 @@ def main() -> None:
         except Exception as e:
             logger.error(f"[{task_id}] FAILED: {e}")
             results[task_id] = {"task_id": task_id, "error": str(e), "score": 0.0, "passed": False}
+            # Still emit a valid [END] block so the validator doesn't choke
+            emit_end(task_id, 0.0, 0)
 
-    print("\n" + "=" * 60)
-    print("BASELINE SCORES")
-    print("=" * 60)
+    print("\n" + "=" * 60, flush=True)
+    print("BASELINE SCORES", flush=True)
+    print("=" * 60, flush=True)
     for task_id, r in results.items():
         status = "✓ PASS" if r.get("passed") else "✗ FAIL"
-        print(f"{status} | {task_id:<35} | score={r.get('score', 0):.4f}")
-    print("=" * 60)
-    print(json.dumps(results, indent=2))
+        print(f"{status} | {task_id:<35} | score={r.get('score', 0):.4f}", flush=True)
+    print("=" * 60, flush=True)
+    print(json.dumps(results, indent=2), flush=True)
 
 
 if __name__ == "__main__":
