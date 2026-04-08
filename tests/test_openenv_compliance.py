@@ -235,9 +235,11 @@ class TestGraders:
         assert len(result.breakdown) > 0
 
     def test_empty_episode_scores_minimum(self, env):
-    env.reset(seed=42, task_id="task_01_single_zone")
+        env.reset(seed=42, task_id="task_01_single_zone")
         result = env.grade()
-        assert result.score == 0.01  
+        assert result.score == 0.01  # clamped minimum: validator forbids exact 0.0
+
+
 # ---------------------------------------------------------------------------
 # 6. Episode lifecycle
 # ---------------------------------------------------------------------------
