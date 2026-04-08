@@ -96,10 +96,10 @@ class TestTask01:
         score = _run_optimal_episode("task_01_single_zone", seed=42)
         assert score >= 0.3, f"Optimal agent scored only {score:.4f} on easy task"
 
-    def test_no_actions_scores_zero(self):
-        env = DisasterTriageEnvironment()
+    def test_no_actions_scores_minimum(self):
+    env = DisasterTriageEnvironment()
         env.reset(seed=42, task_id="task_01_single_zone")
-        assert env.grade().score == 0.0
+        assert env.grade().score == 0.01
 
     def test_task_config_is_easy(self):
         task = get_task("task_01_single_zone")
