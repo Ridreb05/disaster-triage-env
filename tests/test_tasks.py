@@ -97,9 +97,9 @@ class TestTask01:
         assert score >= 0.3, f"Optimal agent scored only {score:.4f} on easy task"
 
     def test_no_actions_scores_minimum(self):
-    env = DisasterTriageEnvironment()
+        env = DisasterTriageEnvironment()
         env.reset(seed=42, task_id="task_01_single_zone")
-        assert env.grade().score == 0.01
+        assert env.grade().score == 0.01  # clamped minimum: validator forbids exact 0.0
 
     def test_task_config_is_easy(self):
         task = get_task("task_01_single_zone")
