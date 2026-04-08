@@ -2,7 +2,7 @@ openenv-core==0.2.3
 
 # Web server
 fastapi==0.115.2
-uvicorn[standard]==0.30.6
+uvicorn[standard]>=0.35.0
 
 # Data validation
 pydantic>=2.11.7,<2.12
