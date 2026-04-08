@@ -1,0 +1,8 @@
+Respond with exactly this JSON structure and nothing else:
+{
+  "zone_id": <int — index of the target zone>,
+  "resource_type": <"medical_team" | "rescue_unit" | "supply_drop" | "hazmat_crew">,
+  "quantity": <int between 1 and 5>,
+  "priority": <"immediate" | "urgent" | "delayed" | "expectant">,
+  "reasoning": "<one sentence explaining your choice>"
+}

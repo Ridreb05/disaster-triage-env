@@ -1,0 +1,15 @@
+Example 1 — Earthquake zone, high severity:
+Zone 2: severity=0.92, hazard=earthquake, accessible=true, pop=800
+→ {"zone_id": 2, "resource_type": "medical_team", "quantity": 3, "priority": "immediate", "reasoning": "Highest severity earthquake zone requires immediate medical response."}
+
+Example 2 — Flood zone, medium severity:
+Zone 0: severity=0.61, hazard=flood, accessible=true, pop=350
+→ {"zone_id": 0, "resource_type": "rescue_unit", "quantity": 2, "priority": "urgent", "reasoning": "Flood rescue prioritized with rescue units for urgent water extraction."}
+
+Example 3 — Hazmat zone:
+Zone 4: severity=0.74, hazard=hazmat, accessible=true, pop=120
+→ {"zone_id": 4, "resource_type": "hazmat_crew", "quantity": 2, "priority": "immediate", "reasoning": "Hazmat spill requires specialized crew before any other resource can operate."}
+
+Example 4 — Multiple zones, choose highest:
+Zone 1: severity=0.45 (delayed), Zone 3: severity=0.88 (immediate)
+→ {"zone_id": 3, "resource_type": "medical_team", "quantity": 2, "priority": "immediate", "reasoning": "Zone 3 has critical severity and must be addressed before lower-priority zones."}

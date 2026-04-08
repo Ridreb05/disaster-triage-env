@@ -1,0 +1,25 @@
+openenv-core>=0.2.0
+# Web server
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+websockets>=10.4,<13.0
+
+# Data validation
+pydantic==2.9.2
+
+# Numerical simulation (seeded RNG)
+numpy==1.26.4
+
+# Inference / baseline agent
+openai==2.7.2
+
+# HTTP client (used by client.py)
+httpx==0.27.2
+
+# Testing
+pytest==8.3.3
+pytest-asyncio==0.24.0
+
+# Gradio UI (optional, for HF Spaces demo)
+gradio==4.44.0
+plotly==5.24.1

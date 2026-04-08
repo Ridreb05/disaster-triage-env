@@ -1,0 +1,87 @@
+# Copyright (c) 2024 Debanik Das. BSD-3-Clause License.
+---
+title: Disaster Triage Environment
+emoji: 🚨
+colorFrom: red
+colorTo: orange
+sdk: docker
+pinned: true
+tags:
+  - openenv
+  - reinforcement-learning
+  - disaster-response
+  - triage
+  - real-world
+
+name: disaster_triage_env
+version: "1.0.0"
+description: >
+  A high-fidelity disaster response triage environment where an AI agent
+  allocates emergency resources (medical teams, rescue units, supply drops)
+  across a grid of incident zones under time pressure and cascading hazard
+  conditions. Seeded deterministic scenarios ensure reproducible evaluation.
+
+author: Debanik Das
+license: BSD-3-Clause
+
+environment:
+  entry_point: server.app:app
+  port: 8000
+
+tasks:
+  - id: task_01_single_zone
+    name: Single Zone Triage
+    difficulty: easy
+    description: Allocate one medical team to the highest-severity incident in a single zone.
+  - id: task_02_multi_zone
+    name: Multi-Zone Priority Routing
+    difficulty: medium
+    description: Triage 5 simultaneous incidents across zones with limited resources and priority ordering.
+  - id: task_03_cascading_hazards
+    name: Cascading Hazard Response
+    difficulty: hard
+    description: Respond to a dynamic 10-zone disaster with cascading hazards, resource exhaustion, and time-decay penalties.
+
+action_space:
+  type: structured
+  schema: DisasterAction
+  fields:
+    - name: zone_id
+      type: int
+      description: Target zone index (0-indexed)
+    - name: resource_type
+      type: string
+      enum: [medical_team, rescue_unit, supply_drop, hazmat_crew]
+      description: Type of resource to deploy
+    - name: quantity
+      type: int
+      min: 1
+      max: 5
+      description: Number of units to deploy
+    - name: priority
+      type: string
+      enum: [immediate, urgent, delayed, expectant]
+      description: START triage classification for this deployment
+
+observation_space:
+  type: structured
+  schema: DisasterObservation
+  fields:
+    - name: zones
+      type: array[ZoneState]
+      description: Per-zone state including severity, hazard type, population at risk
+    - name: resources_remaining
+      type: ResourceInventory
+      description: Remaining deployable resources per type
+    - name: elapsed_steps
+      type: int
+      description: Steps elapsed in current episode
+    - name: active_hazards
+      type: array[HazardEvent]
+      description: Currently active cascading hazard events
+    - name: cumulative_reward
+      type: float
+      description: Cumulative reward so far this episode
+    - name: task_id
+      type: string
+      description: Current active task identifier
