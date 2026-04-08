@@ -11,7 +11,7 @@ pydantic==2.9.2
 numpy==1.26.4
 
 # Inference / baseline agent
-openai==2.7.2
+openai>=2.7.2
 
 # HTTP client (used by client.py)
 httpx==0.27.2
