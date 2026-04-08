@@ -11,18 +11,30 @@ from dataclasses import dataclass, field
 from simulation.incident_generator import ScenarioConfig
 
 
+def clamp_score(score: float) -> float:
+    """Clamp score to the open interval (0.01, 0.99).
+
+    The OpenEnv validator rejects scores exactly equal to 0.0 or 1.0
+    (requires strictly between 0 and 1). This utility ensures every
+    GraderResult is compliant regardless of raw arithmetic outcomes.
+    """
+    return round(max(0.01, min(0.99, score)), 4)
+
+
 @dataclass
 class GraderResult:
     """Structured grading output returned by /grader endpoint."""
     task_id: str
-    score: float                          # 0.0 – 1.0
+    score: float                          # strictly in (0.01, 0.99) after __post_init__
     max_score: float = 1.0
     breakdown: dict = field(default_factory=dict)
     feedback: str = ""
     passed: bool = False
 
     def __post_init__(self):
-        assert 0.0 <= self.score <= 1.0, f"Score {self.score} out of range"
+        # Enforce the open-interval requirement imposed by the OpenEnv validator.
+        # Scores of exactly 0.0 or 1.0 cause disqualification.
+        self.score = clamp_score(self.score)
         self.passed = self.score >= self.passing_threshold
 
     @property
@@ -60,7 +72,7 @@ class BaseTask(ABC):
                 }
 
         Returns:
-            GraderResult with score in [0.0, 1.0]
+            GraderResult with score strictly in (0.01, 0.99)
         """
         ...
 
