@@ -234,7 +234,7 @@ class TestGraders:
         assert isinstance(result.breakdown, dict)
         assert len(result.breakdown) > 0
 
-def test_empty_episode_scores_minimum(self, env):
+    def test_empty_episode_scores_minimum(self, env):
     env.reset(seed=42, task_id="task_01_single_zone")
         result = env.grade()
         assert result.score == 0.01  
