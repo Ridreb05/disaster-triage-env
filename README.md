@@ -23,7 +23,7 @@ An OpenEnv-compliant reinforcement learning environment where an AI agent acts a
 
 ## Environment Description
 
-The agent manages a grid of incident zones, each with a severity score, population at risk, hazard type (flood, earthquake, hazmat, fire), and accessibility status. Every step, the agent deploys one resource type to one zone. Hazards can cascade to adjacent zones if not contained in time. The reward signal is rich and partial — every step provides feedback, not just end-of-episode.
+The agent manages a grid of incident zones, each with a severity score, population at risk, hazard type (flood, earthquake, hazmat, fire), and accessibility status. Every step, the agent deploys one resource type to one zone. Hazards can cascade to adjacent zones if not contained in time. 
 
 **Why this task?**  
 Disaster triage is a real, high-stakes decision problem that humans perform under extreme uncertainty. It has clear optimal strategies (severity-first, hazard-matched resources, START triage classification) while remaining complex enough that naive agents score poorly. All scenarios are synthetically generated with seeded randomness — no external APIs required.
